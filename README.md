@@ -214,6 +214,8 @@
 | Mc3EBin         | 否    |  否  | 無    |100%    |商業用戶    |
 | VigorVsOverTcp   | 否   |  否  | 無    |100%    |商業用戶    |
 
+## 社群討論
+Line社群 : https://line.me/ti/g2/r7X-QLCfoWDjBdrwbv5QGdhwBTtv26QESugSrA?utm_source=invitation&utm_medium=link_copy&utm_campaign=default
 
 ## 聲明
 - 由於該專案屬於實驗性功能專案，請不要再實際機台做測試以及商業使用。
