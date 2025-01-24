@@ -183,6 +183,14 @@
 3. 打開專案nuget搜尋Touchsocket，安裝Touchsocket以及Touchsocket.Core
 4. 在專案輸出位置，通常在(bin/Debug或bin/Release)，新增一個plugins資料夾，將想要使用的通訊插件放入。
 
+- 小技巧，當請求完Send或是Write時，都會返回QJResult<T>結果，QJResult的封裝有興趣可以去看原始碼，這邊要解釋的是可以透過IsOk來判斷是否請求成功。
+```c#
+ // 請求讀取有符號16位元4x100的1筆數據
+ res = plugin.ReadInt16("4x", 100, 1);
+ if (res.IsOk) Console.WriteLine(res.Data[0]); //判斷請求成功打印結果
+ Console.WriteLine(res.Message);
+```
+
 ### 開發者必看
 - 開啟專案 "開發板模" 加入QJ.Communication.Core專案 參考。
 1. 新增新專案，選擇 新增類別庫 ，注意 注意 注意 專案名稱請一定要以"QJ.Communication.Tcp" 或"QJ.Communication.Serial"為開頭，為了後期快速測試建議開發者遵循該命名規範，版本選擇netstandard2.0，這樣就可以下一步完成了。
@@ -193,6 +201,10 @@
 - Exceptions //異常處理
 - Interface  //介面
 - AnyName.cs //主程式
+
+## 實例分享
+### Modbus批量寫入
+![image](https://github.com/user-attachments/assets/d900253b-c0ca-4e7c-b8cf-47fb33a7054b)
 
 ## 聲明
 - 由於該專案屬於實驗性功能專案，請不要再實際機台做測試以及商業使用。
