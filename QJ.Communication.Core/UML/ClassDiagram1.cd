@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="QJ.Communication.Core.Cores.Serial.SerialCore" Collapsed="true">
+    <Position X="15.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAQEAAAAAAAACAAAAEAAAMAAAAgEAABAAAAAAAAAAAA=</HashCode>
+      <FileName>Cores\Serial\SerialCore.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.Cores.Tcp.TcpCore" Collapsed="true">
+    <Position X="17.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAQEAAAAAAAACAAAAECAAMAACAgEAAAAAAAAAAAQAAA=</HashCode>
+      <FileName>Cores\Tcp\TcpCore.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.Enum.CommandModeEnum" Collapsed="true">
+    <Position X="17.5" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enum\CommandModeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.Enum.EndianEnum" Collapsed="true">
+    <Position X="15.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enum\EndianEnum.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.Extension.ByteExtension" Collapsed="true">
+    <Position X="14" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAACAAAAAAAAAAAAoAAABAAAAAAAAAAAAACCAAAAAA=</HashCode>
+      <FileName>Extension\ByteExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.Extension.PropExtension" Collapsed="true">
+    <Position X="15.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>Extension\PropExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.Helper.ByteHelper" Collapsed="true">
+    <Position X="15.75" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAwAAIAABAAAAIAAEARgZAAAgAgAAAAIQACEEAABiAA=</HashCode>
+      <FileName>Helper\ByteHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.Helper.PluginHelper" Collapsed="true">
+    <Position X="17.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQgAAAAAAAAA=</HashCode>
+      <FileName>Helper\PluginHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.Model.Plugin.QJPluginBase">
+    <Position X="9.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>MAAAAAAAAAAgAQAAgAEAAAQAAAAAAAAAAACABAAAAAA=</HashCode>
+      <FileName>Model\Plugin\QJPluginBase.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="QJ.Communication.Core.Model.Plugin.QJSerialPluginBase">
+    <Position X="7.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAREgAQiAAAAAAAAgEABgIAAAAgCAAABAEARgAEAAQA=</HashCode>
+      <FileName>Model\Plugin\QJSerialPluginBase.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="QJ.Communication.Core.Model.Plugin.QJTcpPluginBase">
+    <Position X="10.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAREAAQiAAAAABAAgECBgIAAKAgCAAAAAEARgAEQAQA=</HashCode>
+      <FileName>Model\Plugin\QJTcpPluginBase.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="QJ.Communication.Core.Model.Result.QJResult" Collapsed="true">
+    <Position X="17.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAABAAAAAAIAAAAAA=</HashCode>
+      <FileName>Model\Result\QJResult.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.Model.Result.QJResult&lt;T&gt;" Collapsed="true">
+    <Position X="19.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAABAAAAAAIAAAAAA=</HashCode>
+      <FileName>Model\Result\QJResult.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.Model.SerialPorts.QJSerialPortProp" Collapsed="true">
+    <Position X="14" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAACCAAAAAABAEAAAAAAgAAAAAAAAAAAAEAAAUAAA=</HashCode>
+      <FileName>Model\SerialPorts\QJSerialPortProp.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.CommonMsg" Collapsed="true">
+    <Position X="19.25" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAoB8AAAAAAAAAAGAfAAA=</HashCode>
+      <FileName>CommonMsg.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.Core" Collapsed="true">
+    <Position X="14" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAACAAAAAAA=</HashCode>
+      <FileName>Core.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.PluginLoader" Collapsed="true">
+    <Position X="14" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAABgAAACAAAAAAAAAAAABAAAAAAAEAAAAI=</HashCode>
+      <FileName>PluginLoader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QJ.Communication.Core.PluginInfo" Collapsed="true">
+    <Position X="19.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAgAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PluginLoader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="QJ.Communication.Core.Interface.INetCommunication" Collapsed="true">
+    <Position X="14" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAREAAAgAAAAAAAAgECBAIAACAgAAAAAAAAAAAAQAQA=</HashCode>
+      <FileName>Interface\INetCommunication.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="QJ.Communication.Core.Interface.IQJPlugin" Collapsed="true">
+    <Position X="15.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>MAAAAAAAAAAgAQAAgAEAAAQAAAAAAAAAAACABAAAAAA=</HashCode>
+      <FileName>Interface\IQJPlugin.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="QJ.Communication.Core.Interface.ISerialCommunication" Collapsed="true">
+    <Position X="17.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAREAAAgAAAAAAAAgEABAIAAAAgAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Interface\ISerialCommunication.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="QJ.Communication.Core.Interface.IVariable" Collapsed="true">
+    <Position X="19.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interface\IVariable.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="QJ.Communication.Core.Interface.IVariableRead" Collapsed="true">
+    <Position X="14" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQCAAAAAAAAAAAAgAAAAAACAAAAAEARgAAAAAA=</HashCode>
+      <FileName>Interface\IVariableRead.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="QJ.Communication.Core.Interface.IVariableWrite" Collapsed="true">
+    <Position X="15.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Interface\IVariableWrite.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="QJ.Communication.Core.Enum.FeatureEnum" Collapsed="true">
+    <Position X="15.75" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>JAAEAAAAIAACAAAAAAAAAAAAQACAAAAAAAgACAEAAAA=</HashCode>
+      <FileName>Enum\FeaturesEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="QJ.Communication.Core.Helper.StringEncoding" Collapsed="true">
+    <Position X="17.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
+      <FileName>Helper\ByteHelper.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="QJ.Communication.Core.Interface.CommunicationEnum" Collapsed="true">
+    <Position X="14" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAEAAgA=</HashCode>
+      <FileName>Interface\IQJPlugin.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Microsoft JhengHei UI" Size="9" />
+</ClassDiagram>

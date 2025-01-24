@@ -1,0 +1,43 @@
+<Project>
+  <PropertyGroup>
+    <PluginOutputPath>$(SolutionDir)QJ.Communication.FrameTest\bin\Debug\plugins</PluginOutputPath>
+	<!--<PluginOutputPath>$(SolutionDir)QJ.Communication.Gateway\bin\Debug\plugins</PluginOutputPath>-->
+	  
+    <IsPlugin>false</IsPlugin>
+    <IsPlugin Condition="$(MSBuildProjectName.Contains('QJ.Communication.Tcp')) Or 
+                        $(MSBuildProjectName.Contains('QJ.Communication.Serial'))">true</IsPlugin>
+  </PropertyGroup>
+
+ <Target Name="PrintDebugInfo" BeforeTargets="Build" Condition="'$(IsPlugin)' == 'true'">
+    <Message Text="===== 建置資訊 =====" Importance="high" />
+    <Message Text="專案名稱: $(MSBuildProjectName)" Importance="high" />
+    <Message Text="是否為插件: $(IsPlugin)" Importance="high" />
+    <Message Text="輸出路徑: $(PluginOutputPath)" Importance="high" />
+    <Message Text="建置組態: $(Configuration)" Importance="high" />
+  </Target>
+
+  <Target Name="CopyPlugin" AfterTargets="Build" Condition="'$(IsPlugin)' == 'true'">
+    <MakeDir Directories="$(PluginOutputPath)" Condition="!Exists('$(PluginOutputPath)')" />
+    
+    <Copy
+      SourceFiles="$(TargetPath)"
+      DestinationFolder="$(PluginOutputPath)"
+      SkipUnchangedFiles="true" />
+    
+    <!--<ItemGroup>
+      <PluginDependencies Include="$(TargetDir)*.dll" Exclude="$(TargetPath)" />
+    </ItemGroup>-->
+    
+    <Copy
+      SourceFiles="@(PluginDependencies)"
+      DestinationFolder="$(PluginOutputPath)"
+      SkipUnchangedFiles="true"
+      Condition="'@(PluginDependencies)' != ''" />
+    
+	
+	<!-- 添加提示訊息 -->	
+	<Message Text="插件 [$(MSBuildProjectName)] ---> 複製到: [$(PluginOutputPath)] 目錄下" Importance="high" />
+	<Message Text="若是想要更改位置請編輯sln跟目錄下的Directory.Build.props配置檔案" Importance="high" />
+
+  </Target>
+</Project>
