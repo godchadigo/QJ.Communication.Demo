@@ -217,6 +217,13 @@
 ## 社群討論
 Line社群 : https://line.me/ti/g2/r7X-QLCfoWDjBdrwbv5QGdhwBTtv26QESugSrA?utm_source=invitation&utm_medium=link_copy&utm_campaign=default
 
+## 影片
+### 使用者
+- 入門1 : https://youtu.be/4hV0WZ-OWsI
+
+### 開發者
+- 入門1 : https://youtu.be/OgldwL02Xpg
+
 ## 聲明
 - 由於該專案屬於實驗性功能專案，請不要再實際機台做測試以及商業使用。
 - 插件開發者的部分暫時不開放，等資料完善後再作規劃。
