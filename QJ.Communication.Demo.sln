@@ -9,6 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QJ.Communication.FrameTest"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QJ.Communication.Demo1", "QJ.Communication.Demo1\QJ.Communication.Demo1.csproj", "{A9687B74-F614-4C65-B04E-7D5D623B876D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "插件", "插件", "{1FB56B38-5F62-4DA1-AB04-D0C7DA26DFD0}"
+	ProjectSection(SolutionItems) = preProject
+		plugins\QJ.Communication.Tcp.ModbusV2.dll = plugins\QJ.Communication.Tcp.ModbusV2.dll
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
