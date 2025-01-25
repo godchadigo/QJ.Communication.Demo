@@ -34,11 +34,15 @@ namespace QJ.Communication.FrameTest
 
             // Tcp通訊核心
             var device = new TcpCore("ModbusTcpV2", out bool _Init);
-            // 設備參數
-            device.IpAddress = "127.0.0.1";
-            device.Port = 502;
-            // 顯示請求封包
-            device.GetPluginBase().IsShowRequestMessage = true;
+            if (_Init)
+            {
+                // 設備參數
+                device.IpAddress = "127.0.0.1";
+                device.Port = 502;
+                // 顯示請求封包
+                device.GetPluginBase().IsShowRequestMessage = true;
+            }
+            
 
             // 添加設備到列表中
             _TcpcDevices.Add("設備1號", device);
