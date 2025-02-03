@@ -1,4 +1,4 @@
-﻿using QJ.Communication.Core.Cores.Tcp;
+using QJ.Communication.Core.Cores.Tcp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,8 +17,9 @@ namespace QJ.Communication.Demo1
         private Dictionary<string, TcpCore> _TcpDevices = new Dictionary<string, TcpCore>();
         public Form1()
         {
+            
             InitializeComponent();
-
+      
             var t1 = Task.Run(() => Init());
             t1.Wait();
             var t2 = Task.Run(() => ConnectAllDevice());
@@ -74,6 +75,11 @@ namespace QJ.Communication.Demo1
 
             //var res = plugin.Write("0x", 0, new bool[2] { true, true });
             //if (!res.IsOk) Console.WriteLine(res.Message);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine("妳好");
         }
     }
 }
