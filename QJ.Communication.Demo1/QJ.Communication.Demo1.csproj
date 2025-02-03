@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32bit>false</Prefer32bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -109,13 +110,13 @@
     <Analyzer Include="..\packages\TouchSocket.Core.3.0.12\analyzers\dotnet\cs\TouchSocket.Core.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Readme.md" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\QJ.Communication.Core\QJ.Communication.Core.csproj">
       <Project>{d73a6222-c42c-4341-98af-0f73a00d2f57}</Project>
       <Name>QJ.Communication.Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Readme.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

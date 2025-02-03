@@ -15,6 +15,7 @@ using TouchSocket.Sockets;
 using System.Windows.Forms;
 #endif
 
+
 namespace QJ.Communication.Core.Cores.Tcp
 {
     /// <summary>
