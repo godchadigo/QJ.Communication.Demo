@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QJ.Communication.Demo1", "Q
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "插件", "插件", "{1FB56B38-5F62-4DA1-AB04-D0C7DA26DFD0}"
 	ProjectSection(SolutionItems) = preProject
+		plugins\QJ.Communication.Tcp.Mc3EBin.dll = plugins\QJ.Communication.Tcp.Mc3EBin.dll
+		plugins\QJ.Communication.Tcp.VigorVs.dll = plugins\QJ.Communication.Tcp.VigorVs.dll
 		plugins\QJ.Communication.Tcp.ModbusV2.dll = plugins\QJ.Communication.Tcp.ModbusV2.dll
 	EndProjectSection
 EndProject
