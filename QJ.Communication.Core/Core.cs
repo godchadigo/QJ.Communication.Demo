@@ -1,11 +1,8 @@
 ﻿using QJ.Communication.Core.Extension;
 using QJ.Communication.Core.Helper;
-using QJ.Communication.Core.Interface;
 using QJ.Communication.Core.Model.Plugin;
 using QJ.Communication.Core.Model.Result;
-using System;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
 namespace QJ.Communication.Core
@@ -74,8 +71,8 @@ namespace QJ.Communication.Core
         }
         public QJResult<string> Version(string plugName)
         {
-            var _res = PluginHelper.Instance.Plugins.ContainsKey(plugName);
-            if (!_res)
+            var res = PluginHelper.Instance.Plugins.ContainsKey(plugName);
+            if (!res)
             {
                 return new QJResult<string>() { IsOk = false , Message = CommonMsg.MSG_PLUGIN_ERR_1};
             }

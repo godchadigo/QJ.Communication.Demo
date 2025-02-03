@@ -11,6 +11,10 @@ using System.Threading.Tasks;
 using TouchSocket.Core;
 using TouchSocket.Sockets;
 
+#if NETFRAMEWORK
+using System.Windows.Forms;
+#endif
+
 namespace QJ.Communication.Core.Cores.Tcp
 {
     /// <summary>
@@ -33,7 +37,12 @@ namespace QJ.Communication.Core.Cores.Tcp
                 //var _qJPlugin = PluginHelper.Instance.Plugins[_plugName];
                 if (!PluginHelper.Instance.Plugins.ContainsKey(_plugName))
                 {
-                    Console.WriteLine($"找不到插件{_plugName}，請檢察名稱是否正確，或是該插件已經被鎖定!");
+#if NETFRAMEWORK
+                    MessageBox.Show($"找不到插件{_plugName}，請檢察名稱是否正確，或是該插件已經被鎖定!");
+#else
+                    Console.WriteLine($"找不到插件{_plugName}，請檢察名稱是否正確，或是該插件已經被鎖定!");         
+#endif
+                   
                     _res = false;
                     return;
                 }
