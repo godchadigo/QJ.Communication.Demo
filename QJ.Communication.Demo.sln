@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "方案項目", "方案項�
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Example", "Example", "{91FA828B-13EB-46DB-8018-72A28F4DF0CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,5 +41,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {46D74B47-3177-4008-92B2-4AC92A6711DF}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A9687B74-F614-4C65-B04E-7D5D623B876D} = {91FA828B-13EB-46DB-8018-72A28F4DF0CA}
 	EndGlobalSection
 EndGlobal
