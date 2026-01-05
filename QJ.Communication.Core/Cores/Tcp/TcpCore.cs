@@ -12,6 +12,8 @@ using TouchSocket.Core;
 using TouchSocket.Sockets;
 using QJ.Communication.Core.Enums;
 using QJ.Communication.Core.Extension;
+using System.Threading;
+
 
 
 #if NETFRAMEWORK
@@ -93,9 +95,12 @@ namespace QJ.Communication.Core.Cores.Tcp
             return new QJResult() { IsOk = false };
         }
 
-        public Task DisconnectAsync()
+        public async Task DisconnectAsync()
         {
-            return Task.CompletedTask;
+            if (qJPlugin is QJTcpPluginBase tcpPlugin)
+            {
+                await tcpPlugin.DisconnectAsync();                
+            }
         }
     }
 }
