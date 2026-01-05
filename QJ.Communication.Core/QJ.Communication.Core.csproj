@@ -5,12 +5,13 @@
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;ARM64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="TouchSocket" Version="3.0.12" />
-    <PackageReference Include="TouchSocket.Core" Version="3.0.12" />
-    <PackageReference Include="TouchSocket.SerialPorts" Version="3.0.10" />
+    <PackageReference Include="TouchSocket" Version="4.0.6" />
+    <PackageReference Include="TouchSocket.Core" Version="4.0.6" />
+    <PackageReference Include="TouchSocket.SerialPorts" Version="4.0.6" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
@@ -59,9 +60,10 @@
     <Folder Include="Cores\Udp\" />
   </ItemGroup>
 
-	<!-- 針對 .NET Framework 版本添加 Windows Forms 引用 -->
-	<ItemGroup Condition="'$(TargetFramework)' == 'net472' Or '$(TargetFramework)' == 'net480' Or '$(TargetFramework)' == 'net481'">
-		<Reference Include="System.Windows.Forms" />
-	</ItemGroup>
+
+<!-- 針對 .NET Framework 版本添加 Windows Forms 引用 -->
+<ItemGroup Condition="'$(TargetFramework)' == 'net472' Or '$(TargetFramework)' == 'net480' Or '$(TargetFramework)' == 'net481'">
+	<Reference Include="System.Windows.Forms" />
+</ItemGroup>
 
 </Project>

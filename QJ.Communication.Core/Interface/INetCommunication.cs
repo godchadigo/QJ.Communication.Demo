@@ -29,24 +29,34 @@ namespace QJ.Communication.Core.Interface
         /// <param name="ip">IP</param>
         /// <param name="port">Port</param>
         /// <returns></returns>
+        [Obsolete("該接口因為TS套件全面改為Async防止死鎖所以直接棄用該方法")]
         QJResult<TcpClient> Connect(string ip, int port);
         /// <summary>
         /// 連接連線目標，傳入TcpClient進行初始化複寫
         /// </summary>
         /// <param name="tcpClient">Touchsocket TcpClient實體</param>
         /// <returns></returns>
+        [Obsolete("該接口因為TS套件全面改為Async防止死鎖所以直接棄用該方法")]
         QJResult<TcpClient> Connect(TcpClient tcpClient);
+        /// <summary>
+        /// 連接連線目標
+        /// </summary>
+        /// <param name="ip">IP</param>
+        /// <param name="port">Port</param>
+        /// <returns></returns>
+        Task<QJResult<TcpClient>> ConnectAsync(string ip, int port, int timeout);
+        /// <summary>
+        /// 連接連線目標，傳入TcpClient進行初始化複寫
+        /// </summary>
+        /// <param name="tcpClient">Touchsocket TcpClient實體</param>
+        /// <returns></returns>
+        Task<QJResult<TcpClient>> ConnectAsync(TcpClient tcpClient, int timeout);
         /// <summary>
         /// 斷開目標設備連線
         /// </summary>
+        [Obsolete("該接口因為TS套件全面改為Async防止死鎖所以直接棄用該方法")]
         void Disconnect();
-        /// <summary>
-        /// 連接目標設備(非同步)
-        /// </summary>
-        /// <param name="ip"></param>
-        /// <param name="port"></param>
-        /// <returns></returns>
-        Task ConnectAsync(string ip, int port);
+
         /// <summary>
         /// 斷開目標設備(非同步)
         /// </summary>

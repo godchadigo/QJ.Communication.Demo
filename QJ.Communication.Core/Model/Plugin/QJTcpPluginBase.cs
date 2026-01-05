@@ -1,11 +1,14 @@
 ﻿using QJ.Communication.Core.Enum;
 using QJ.Communication.Core.Interface;
+using QJ.Communication.Core.Interface.Adapter;
 using QJ.Communication.Core.Model.Result;
 using Serilog;
+using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using TouchSocket.Core;
@@ -17,24 +20,57 @@ namespace QJ.Communication.Core.Model.Plugin
     /// <summary>
     /// Tcp插件基類
     /// </summary>
-    public abstract class QJTcpPluginBase : QJPluginBase, INetCommunication , IVariableRead, IVariableWrite, IVariableReadAsync , IVariableWriteAsync
+    public abstract class QJTcpPluginBase : QJPluginBase, INetCommunication 
     {
 
         public override CommunicationEnum communicationType => CommunicationEnum.Tcp;
-
+        public QJTcpPluginBase()
+        {
+        }
 
         #region INetCommunication
-        public TcpClient tcpClient;
-
-
+        /// <summary>
+        /// Tcp Client 基底實例
+        /// 當連線成功後，會賦予tcpClient實例到此屬性。
+        /// 插件若是繼承該QJTcpPluginBase並且調用Connect方法，則會自動賦予tcpClient實例。
+        /// </summary>
+        public TcpClient _tcpClient;
+        /// <summary>
+        /// 目標連線的IP地址
+        /// </summary>
         public virtual string IpAddress {  get; set; }
-
+        /// <summary>
+        /// 目標連線的Port
+        /// </summary>
         public virtual int Port { get; set; }
+        public async Task<QJResult<TcpClient>> ConnectAsync(TcpClient tcpClient, int timeout = 1000)
+        {
+            QJResult<TcpClient> qJResult = new QJResult<TcpClient>() { IsOk = false };
+            try
+            {            
+                _tcpClient = tcpClient;
+                await tcpClient.ConnectAsync(timeout);//调用连接，当连接不成功时，会抛出异常。
 
-        
-        
-        
-        public virtual QJResult<TcpClient> Connect(string ip, int port) 
+                Console.WriteLine("Tcp Client Connected!");
+                qJResult.IsOk = true;
+                qJResult.Data = tcpClient;
+                return qJResult;
+            }
+            catch (Exception ex)
+            {
+                qJResult.IsOk = false;
+                qJResult.Message = ex.Message;
+                return qJResult;
+            }
+        }
+
+        /// <summary>
+        /// 建立Tcp連線到目標設備
+        /// </summary>
+        /// <param name="ip">目標IP</param>
+        /// <param name="port">目標Port</param>
+        /// <returns></returns>
+        public virtual async Task<QJResult<TcpClient>> ConnectAsync(string ip, int port, int timeout = 1000) 
         {
             QJResult<TcpClient> qJResult = new QJResult<TcpClient>() { IsOk = false };
             try
@@ -42,28 +78,20 @@ namespace QJ.Communication.Core.Model.Plugin
                 IpAddress = ip;
                 Port = port;
 
-                tcpClient.Connecting = (client, e) => { return EasyTask.CompletedTask; };//即将连接到服务器，此时已经创建socket，但是还未建立tcp
-                tcpClient.Connected = (client, e) => {
+                _tcpClient = new TcpClient();
+                _tcpClient.Connecting = (client, e) => { return EasyTask.CompletedTask; };//即将连接到服务器，此时已经创建socket，但是还未建立tcp
+                _tcpClient.Connected = (client, e) => {
                     Console.WriteLine($"{client.IP} 連接到伺服器成功!");
                     return EasyTask.CompletedTask;
                 };//成功连接到服务器
-                tcpClient.Closing = (client, e) => { return EasyTask.CompletedTask; };//即将从服务器断开连接。此处仅主动断开才有效。
-                tcpClient.Closed = (client, e) => {
+                _tcpClient.Closing = (client, e) => { return EasyTask.CompletedTask; };//即将从服务器断开连接。此处仅主动断开才有效。
+                _tcpClient.Closed = (client, e) => {
                     Console.WriteLine($"{client.IP} 與伺服器斷開!");
                     return EasyTask.CompletedTask; 
                 };//从服务器断开连接，当连接不成功时不会触发。
-                tcpClient.Received = (client, e) =>
-                {
-                    //从服务器收到信息。但是一般byteBlock和requestInfo会根据适配器呈现不同的值。.
-                    /*
-                    var mes = e.ByteBlock.Span.ToString(Encoding.UTF8);
-                    tcpClient.Logger.Info($"客户端接收到信息：{mes}");
-                    */
-                    return EasyTask.CompletedTask;
-                };
 
                 //载入配置
-                tcpClient.Setup(new TouchSocketConfig()
+                await _tcpClient.SetupAsync(new TouchSocketConfig()
                       .SetRemoteIPHost($"{IpAddress}:{Port}")
                       .ConfigureContainer(a =>
                       {
@@ -71,90 +99,75 @@ namespace QJ.Communication.Core.Model.Plugin
                       })
                       .ConfigurePlugins(a =>
                       {
-                          a.UseTcpReconnection()
-                          .UsePolling(TimeSpan.FromSeconds(1));
+                          //a.UseTcpReconnection();
                       }));
 
-                tcpClient.Connect();//调用连接，当连接不成功时，会抛出异常。
+
+                // 訂閱接收事件到TcpPluginBase上
+                _tcpClient.Received += async (sender, e) => {
+
+                    // 判斷該通訊插件是否有實作IAdapterBase接口
+                    if (e.RequestInfo is IRecivedAdapterBase recivedAdapter)
+                    {
+                        // 轉發接收到的數據
+                        await TriggerRecivedRawData(recivedAdapter);
+                    }
+                };
+
+                await _tcpClient.ConnectAsync(timeout);//调用连接，当连接不成功时，会抛出异常。
 
                 //Log.Information("Tcp Client Connected!");
                 Console.WriteLine("Tcp Client Connected!");
                 qJResult.IsOk = true;
-                qJResult.Data = tcpClient;
+                qJResult.Data = _tcpClient;
                 return qJResult;
             }
             catch (Exception ex) {
+                qJResult.IsOk = false;
                 qJResult.Message = ex.Message;
                 return qJResult;
             }           
         }
 
-        public virtual QJResult<TcpClient> Connect(TcpClient _tcpClient)
+
+        /// <summary>
+        /// 非同步斷開連線
+        /// </summary>
+        /// <returns></returns>        
+        public virtual async Task DisconnectAsync() 
         {
-            QJResult<TcpClient> qJResult = new QJResult<TcpClient>() { IsOk = false };
-            try
-            {
-
-                tcpClient = _tcpClient;
-
-                qJResult.IsOk = true;
-                qJResult.Data = _tcpClient;
-               
-                _tcpClient.Connect();//调用连接，当连接不成功时，会抛出异常。
-
-                //Log.Information("Tcp Client Connected!");
-                //Console.WriteLine("Tcp Client Connected!");
-              
-                // 賦予連線後的客戶端到全局變數
-                
-                return qJResult;
-            }
-            catch (Exception ex)
-            {
-                qJResult.Message = ex.Message;
-                return qJResult;
-            }
+            await _tcpClient.CloseAsync();
         }
-        public virtual void Disconnect() {
-            if (tcpClient != null) tcpClient.Close();
-        }
-
-        public virtual Task ConnectAsync(string ip, int port)
-        {
-            IpAddress = ip;
-            Port = port;
-            return Task.CompletedTask;
-        }
-
-        public virtual Task DisconnectAsync() { return Task.CompletedTask; }
-        public virtual void CreateBasePacket() { }
 
         public void Send(byte[] data)
         {
-            if (tcpClient != null)
+            if (_tcpClient != null)
             {
-                tcpClient.Send(data);
+                _tcpClient.SendAsync(data);
             }            
         }
 
         public async Task SendAsync(byte[] data)
         {
-            if (tcpClient != null)
+            if (_tcpClient != null)
             {
-                await tcpClient.SendAsync(data);
+                await _tcpClient.SendAsync(data);
             }
         }
 
         public async Task SendAsync(ReadOnlyMemory<byte> memory)
         {
-            if (tcpClient != null && tcpClient.Online)
+            
+            if (_tcpClient != null && (_tcpClient.Online) && _tcpClient.IP != null)
             {
+#if false
                 var data = memory.ToArray();
                 string str = string.Empty;
                 for (global::System.Int32 i = 0; i < memory.Length; i++)
                 {
                     str += data[i].ToString("X2") + " ";
                 }
+
                 
                 if (base.IsShowRequestMessage)
                 {
@@ -164,24 +177,35 @@ namespace QJ.Communication.Core.Model.Plugin
 #else
                     Debug.WriteLine("request packet -> " + str);
 #endif
-                }
 
-                await tcpClient.SendAsync(memory);
+                   
+                }
+#endif
+
+                // 轉發發送的原始數據
+                await TriggerSendRawData(memory.ToArray(), memory.Length);
+                await _tcpClient.SendAsync(memory).ConfigureAwait(false);
+                
             }
         }
         public QJResult<byte[]> SendThenRecived(byte[] data)
         {
+            throw new NotImplementedException();
+        }
+
+        public async Task<QJResult<byte[]>> SendThenRecivedAsync(byte[] data)
+        {
             QJResult<byte[]> qJResult = new QJResult<byte[]>();
-            if (tcpClient != null)
+            if (_tcpClient != null)
             {
-                if (!tcpClient.Online)
+                if (!_tcpClient.Online)
                 {
                     qJResult.IsOk = false;
                     qJResult.Message = "連線階段斷開";
                     return qJResult;
                 }
                 //调用CreateWaitingClient获取到IWaitingClient的对象。
-                var waitClient = tcpClient.CreateWaitingClient(new WaitingOptions()
+                var waitClient = _tcpClient.CreateWaitingClient(new WaitingOptions()
                 {
                     FilterFunc = response => //设置用于筛选的fun委托，当返回为true时，才会响应返回
                     {
@@ -190,30 +214,8 @@ namespace QJ.Communication.Core.Model.Plugin
                 });
 
                 qJResult.IsOk = true;
-                qJResult.Data = waitClient.SendThenReturn(data);
-                return qJResult;
-            }
-            return qJResult;
-        }
-
-
-
-        public async Task<QJResult<byte[]>> SendThenRecivedAsync(byte[] data)
-        {
-            QJResult<byte[]> qJResult = new QJResult<byte[]>();
-            if (tcpClient != null)
-            {
-                //调用CreateWaitingClient获取到IWaitingClient的对象。
-                var waitClient = tcpClient.CreateWaitingClient(new WaitingOptions()
-                {
-                    FilterFunc = response => //设置用于筛选的fun委托，当返回为true时，才会响应返回
-                    {
-                        return true;
-                    }
-                });
-
-                qJResult.IsOk = true;
-                qJResult.Data = await waitClient.SendThenReturnAsync(data);
+                var res = await waitClient.SendThenResponseAsync(data, 1000);
+                qJResult.Data = res.Memory.ToArray();
                 return qJResult;
             }
             return qJResult;
@@ -225,38 +227,7 @@ namespace QJ.Communication.Core.Model.Plugin
         /// <returns></returns>
         public QJResult<IRequestInfo> SendThenRecivedRequestInfo(byte[] data)
         {
-            QJResult<IRequestInfo> qJResult = new QJResult<IRequestInfo>();
-            try
-            {
-                if (tcpClient != null)
-                {
-                    if (!tcpClient.Online)
-                    {
-                        qJResult.IsOk = false;
-                        qJResult.Message = "連線階段斷開";
-                        return qJResult;
-                    }
-                    //调用CreateWaitingClient获取到IWaitingClient的对象。
-                    var waitClient = tcpClient.CreateWaitingClient(new WaitingOptions()
-                    {
-
-                        FilterFunc = response => //设置用于筛选的fun委托，当返回为true时，才会响应返回
-                        {
-                            return true;
-                        }
-                    });
-
-                    qJResult.IsOk = true;
-                    qJResult.Data = waitClient.SendThenResponse(data,1000).RequestInfo;
-                    return qJResult;
-                }
-                return qJResult;
-            }
-            catch (Exception ex)
-            {
-                qJResult.Message = ex.Message;
-                return qJResult;
-            }
+           throw new NotImplementedException();
         }
 
         /// <summary>
@@ -269,16 +240,16 @@ namespace QJ.Communication.Core.Model.Plugin
             QJResult<IRequestInfo> qJResult = new QJResult<IRequestInfo>();
             try
             {
-                if (tcpClient != null)
+                if (_tcpClient != null)
                 {
-                    if (!tcpClient.Online)
+                    if (!_tcpClient.Online)
                     {
                         qJResult.IsOk = false;
                         qJResult.Message = "連線階段斷開";
                         return qJResult;
                     }
                     //调用CreateWaitingClient获取到IWaitingClient的对象。
-                    var waitClient = tcpClient.CreateWaitingClient(new WaitingOptions()
+                    var waitClient = _tcpClient.CreateWaitingClient(new WaitingOptions()
                     {
 
                         FilterFunc = response => //设置用于筛选的fun委托，当返回为true时，才会响应返回
@@ -287,9 +258,9 @@ namespace QJ.Communication.Core.Model.Plugin
                         }
                     });
 
-                    var _response = await waitClient.SendThenResponseAsync(data, 1000);
                     qJResult.IsOk = true;
-                    qJResult.Data = _response.RequestInfo;
+                    var res = await waitClient.SendThenResponseAsync(data, 1000);
+                    qJResult.Data = res.RequestInfo;
                     return qJResult;
                 }
                 return qJResult;
@@ -299,201 +270,22 @@ namespace QJ.Communication.Core.Model.Plugin
                 qJResult.Message = ex.Message;
                 return qJResult;
             }
-        }   
+        }
 
 #endregion
 
-        #region Read
-        public virtual QJResult<List<byte>> Read(string varFunc, ushort address, ushort length)
+        #region 轉發事件功能插件
+        public virtual async Task TriggerSendRawData(byte[] data, int len)
         {
-            throw new NotImplementedException();
-        }
-        public virtual QJResult<List<bool>> ReadBool(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-        public virtual QJResult<List<ushort>> ReadUInt16(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
+            await OnDataSend(data, len, this).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
         }
 
-        public virtual QJResult<List<short>> ReadInt16(string varFunc, ushort address, ushort length)
+        public virtual async Task TriggerRecivedRawData(IRecivedAdapterBase recivedAdapter)
         {
-            throw new NotImplementedException();
+            await OnDataReceived(recivedAdapter, this).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
         }
 
-
-        public virtual QJResult<List<uint>> ReadUInt32(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public virtual QJResult<List<int>> ReadInt32(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public virtual QJResult<List<ulong>> ReadUInt64(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public virtual QJResult<List<long>> ReadInt64(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-        public virtual QJResult<List<float>> ReadFloat(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-        public virtual QJResult<List<double>> ReadDouble(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-        #region Write
-        public virtual QJResult Write(string varFunc, ushort address, bool value)
-        {
-            throw new NotImplementedException();
-        }
-
-
-
-        public virtual QJResult Write(string varFunc, ushort address, bool[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-
-
-        public virtual QJResult Write(string varFunc, ushort address, IEnumerable<bool> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, ushort value)
-        {
-            throw new NotImplementedException();
-        }
-        public virtual QJResult Write(string varFunc, ushort address, ushort[] values)
-        {
-            throw new NotImplementedException();
-        }
-        public virtual QJResult Write(string varFunc, ushort address, IEnumerable<ushort> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, short value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, short[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, IEnumerable<short> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, uint value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, uint[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, IEnumerable<uint> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, int value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, int[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, IEnumerable<int> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, ulong value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, ulong[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, IEnumerable<ulong> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, long value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, long[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, IEnumerable<long> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, float value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, float[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, IEnumerable<float> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, double value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, double[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual QJResult Write(string varFunc, ushort address, IEnumerable<double> values)
-        {
-            throw new NotImplementedException();
-        }
-        public virtual QJResult Write(string varFunc, ushort address, string str, EncodingType encode)
+        public QJResult<TcpClient> Connect(string ip, int port)
         {
             throw new NotImplementedException();
         }
@@ -501,201 +293,86 @@ namespace QJ.Communication.Core.Model.Plugin
 
         #endregion
 
-        #region ReadAsync
-        public virtual Task<QJResult<List<byte>>> ReadAsync(string varFunc, ushort address, ushort length)
+        #region 棄用方法
+
+
+        /// <summary>
+        /// 建立Tcp連線到目標設備，傳入TcpClient實例，請注意若是使用該方法連線，Recevied事件將會QJTcpPluginBase內部處理，如果有需要Recived事件，可以直接使用this.Received事件來處理接收的數據。
+        /// </summary>
+        /// <param name="_tcpClient">TcpClient實例</param>
+        /// <returns></returns>
+        [Obsolete("該接口因為TS套件全面改為Async防止死鎖所以直接棄用該方法")]
+        public virtual async Task<QJResult<TcpClient>> Connect(TcpClient _tcpClient)
+        {
+            QJResult<TcpClient> qJResult = new QJResult<TcpClient>() { IsOk = false };
+            try
+            {
+                // 連線前確保連線沒有連接
+
+                if (this._tcpClient != null)
+                {
+                    this._tcpClient.CloseAsync();
+                }
+
+                // 訂閱接收事件到TcpPluginBase上
+                _tcpClient.Received += async (sender, e) => {
+
+                    // 判斷該通訊插件是否有實作IAdapterBase接口
+                    if (e.RequestInfo is IRecivedAdapterBase recivedAdapter)
+                    {
+                        // 轉發接收到的數據
+                        await TriggerRecivedRawData(recivedAdapter);
+                    }
+                };
+
+                var res = await _tcpClient.TryConnectAsync(1000);//调用连接，当连接不成功时，会抛出异常。
+
+                qJResult.IsOk = res.IsSuccess;
+                qJResult.Data = _tcpClient;
+                this._tcpClient = _tcpClient;
+
+                if (res.IsSuccess)
+                {
+
+                }
+                else
+                {
+                    //qJResult.Data = _tcpClient;
+                    _tcpClient.SafeDispose();
+                }
+                // 賦予連線後的客戶端到全局變數
+
+                return qJResult;
+            }
+            catch (Exception ex)
+            {
+                //throw new Exception("連線到目標異常!");
+                //Task.Run(() => HandleDisconnectAsync()) ;
+                /*
+                Thread t = new Thread(() => HandleDisconnectAsync());
+                t.IsBackground = true;
+                t.Start();
+                */
+                qJResult.IsOk = false;
+                qJResult.Message = ex.Message;
+                return qJResult;
+            }
+        }
+        [Obsolete("該接口因為TS套件全面改為Async防止死鎖所以直接棄用該方法")]
+        QJResult<TcpClient> INetCommunication.Connect(TcpClient tcpClient)
         {
             throw new NotImplementedException();
         }
-        public virtual Task<QJResult<List<bool>>> ReadBoolAsync(string varFunc, ushort address, ushort length)
+
+        /// <summary>
+        /// 斷開連線
+        /// </summary>
+        [Obsolete("該接口因為TS套件全面改為Async防止死鎖所以直接棄用該方法")]
+        public virtual void Disconnect()
         {
-            throw new NotImplementedException();
+            if (_tcpClient != null) _tcpClient.CloseAsync();
         }
-
-        public virtual Task<QJResult<List<ushort>>> ReadUInt16Async(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult<List<short>>> ReadInt16Async(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult<List<uint>>> ReadUInt32Async(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult<List<int>>> ReadInt32Async(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult<List<ulong>>> ReadUInt64Async(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult<List<long>>> ReadInt64Async(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult<List<float>>> ReadFloatAsync(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult<List<double>>> ReadDoubleAsync(string varFunc, ushort address, ushort length)
-        {
-            throw new NotImplementedException();
-        }
-
-
-
         #endregion
 
-        #region WriteAsync
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, bool value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, bool[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, IEnumerable<bool> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, ushort value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, ushort[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, IEnumerable<ushort> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, short value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, short[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, IEnumerable<short> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, uint value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, uint[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, IEnumerable<uint> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, int value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, int[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, IEnumerable<int> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, ulong value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, ulong[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, IEnumerable<ulong> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, long value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, long[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, IEnumerable<long> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, float value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, float[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, IEnumerable<float> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, double value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, double[] values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, IEnumerable<double> values)
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<QJResult> WriteAsync(string varFunc, ushort address, string str, EncodingType encode)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
 }

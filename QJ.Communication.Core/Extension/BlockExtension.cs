@@ -12,27 +12,27 @@ namespace QJ.Communication.Core.Extension
     {
         public static short ToInt16(this ValueByteBlock block)
         {            
-            return block.ReadInt16();
+            return TouchSocketBitConverter.BigEndian.To<short>(block.Span);
         }
         public static int ToInt32(this ValueByteBlock block)
         {
-            return block.ReadInt32();
+            return TouchSocketBitConverter.BigEndian.To<int>(block.Span);
         }
         public static long ToInt64(this ValueByteBlock block)
         {
-            return block.ReadInt64();
+            return TouchSocketBitConverter.BigEndian.To<long>(block.Span);
         }
         public static ushort ToUInt16(this ValueByteBlock block)
         {
-            return block.ReadUInt16();
+            return TouchSocketBitConverter.BigEndian.To<UInt16>(block.Span);
         }
         public static uint ToUInt32(this ValueByteBlock block)
         {
-            return block.ReadUInt32();
+            return TouchSocketBitConverter.BigEndian.To<UInt32>(block.Span);
         }
         public static ulong ToUInt64(this ValueByteBlock block)
         {
-            return block.ReadUInt64();
+            return TouchSocketBitConverter.BigEndian.To<UInt64>(block.Span);
         }
         
         public static List<short> ToInt16Array(this ValueByteBlock block)

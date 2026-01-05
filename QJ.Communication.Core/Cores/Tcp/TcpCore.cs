@@ -10,25 +10,27 @@ using System.Text;
 using System.Threading.Tasks;
 using TouchSocket.Core;
 using TouchSocket.Sockets;
+using QJ.Communication.Core.Enums;
+using QJ.Communication.Core.Extension;
+
 
 #if NETFRAMEWORK
 using System.Windows.Forms;
 #endif
-
 
 namespace QJ.Communication.Core.Cores.Tcp
 {
     /// <summary>
     /// Tcp核心接口
     /// </summary>
-    public class TcpCore
+    public class TcpCore: CommunicationCore
     {
-        public QJTcpPluginBase qJPlugin;
-        public string PluginName {  get; }
-
+        public override string Version => "1.0.0";
+        public override CommunicationCoreTypeEnum CoreType => CommunicationCoreTypeEnum.Tcp;
         public string IpAddress {  get; set; }
-
         public int Port {  get; set; }
+        public bool IsOnline => qJPlugin.IsOnline;        
+
 
         public TcpCore(string _plugName, out bool _res) 
         {
@@ -48,10 +50,17 @@ namespace QJ.Communication.Core.Cores.Tcp
                     return;
                 }
 
-                var _qJPlugin = PluginHelper.Instance.Plugins[_plugName].Clone() as QJPluginBase;
-                if (_qJPlugin is QJTcpPluginBase tcpBase)
+                // 更改為直接使用新的實例而不是克隆插件本體
+                // 直接獲取插件
+                var prototype = PluginHelper.Instance.Plugins[_plugName];
+                // 創建全新插件實例
+                var newInstance = Activator.CreateInstance(prototype.GetType()) as QJTcpPluginBase;
+                
+                // 取消使用克隆方案
+                //var qJPluginClone = PluginHelper.Instance.Plugins[_plugName].Clone() as QJPluginBase;
+                if (newInstance is QJTcpPluginBase tcpBase)
                 {
-                    qJPlugin = tcpBase;
+                    this.qJPlugin = tcpBase;
                     _res = true;
                     return;
                 }
@@ -63,29 +72,25 @@ namespace QJ.Communication.Core.Cores.Tcp
             }                        
         }
  
-        public string Version() => qJPlugin.Version;
-        public QJTcpPluginBase GetPluginBase() => qJPlugin;
+        //public string Version() => qJPlugin.Version;
+        public  QJTcpPluginBase GetPluginBase() => base.qJPlugin as QJTcpPluginBase;
 
-        public void Connect()
+        public async Task<QJResult> ConnectAsync(int timeout=1000)
         {
-            Connect(IpAddress, Port);
+            var res = await ConnectAsync(IpAddress, Port, timeout);
+            return QJExtension.QJDataResponse(res.IsOk);
         }
-        public void Connect(string ip, int port)
+        public async Task<QJResult> ConnectAsync(string ip, int port, int timeout=1000)
         {
             IpAddress = ip;
             Port = port;
-            var qjRes = qJPlugin.Connect(ip,port);
-        }
+            if (qJPlugin is QJTcpPluginBase tcpPlugin)
+            {
+                var res = await tcpPlugin.ConnectAsync(IpAddress, Port, timeout);
+                return QJExtension.QJDataResponse(res.IsOk);                
+            }
 
-        public void Disconnect()
-        {
-            qJPlugin.Disconnect();
-        }
-     
-
-        public Task ConnectAsync(string ip, int port)
-        {
-            return Task.CompletedTask;
+            return new QJResult() { IsOk = false };
         }
 
         public Task DisconnectAsync()

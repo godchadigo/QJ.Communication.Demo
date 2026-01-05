@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TouchSocket.Core;
+using static QJ.Communication.Core.Enum.EndianEnum;
 
 namespace QJ.Communication.Core.Interface
 {
@@ -42,6 +43,11 @@ namespace QJ.Communication.Core.Interface
         /// </summary>
         string Description { get; }
         /// <summary>
+        /// 通訊狀態
+        /// </summary>
+        bool IsOnline { get; set; }
+        byte Station { get; set; }
+        /// <summary>
         /// 插件初始化方法(同步)
         /// </summary>
         void Initialize();
@@ -49,11 +55,13 @@ namespace QJ.Communication.Core.Interface
         /// 插件初始化方法(非同步)
         /// </summary>
         /// <returns></returns>
-        Task InitializeAsync();
+        Task InitializeAsync();   
         /// <summary>
-        /// 插件通訊端序
+        /// 是否啟用Debug
         /// </summary>
-        EndianType EndianType { get; set; }
+        bool UseDebug { get; set; }
+
+        void PrintInformation();
     }
     /// <summary>
     /// 通訊類型

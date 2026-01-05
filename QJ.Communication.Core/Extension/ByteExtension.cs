@@ -78,7 +78,7 @@ namespace QJ.Communication.Core.Extension
         /// <param name="data">要序列化的資料</param>
         /// <param name="endian">端序類型，預設為 ABCD</param>
         /// <returns>序列化後的 byte 陣列</returns>
-        public static byte[] ToByteArray<T>(this T[] data, EndianEnum.EndianType endian = EndianEnum.EndianType.ABCD)
+        public static byte[] ToByteArray<T>(this T[] data, EndianEnum.QJEndianType endian = EndianEnum.QJEndianType.ABCD)
         {
             if (data == null)
                 return null;
@@ -95,7 +95,7 @@ namespace QJ.Communication.Core.Extension
         /// <summary>
         /// 調整 byte 陣列的端序
         /// </summary>
-        private static byte[] ConvertEndian(byte[] source, EndianEnum.EndianType endian)
+        private static byte[] ConvertEndian(byte[] source, EndianEnum.QJEndianType endian)
         {
             if (source == null || source.Length < 2)
                 return source;
@@ -108,20 +108,20 @@ namespace QJ.Communication.Core.Extension
             {
                 switch (endian)
                 {
-                    case EndianEnum.EndianType.ABCD: // 不需轉換
+                    case EndianEnum.QJEndianType.ABCD: // 不需轉換
                         break;
 
-                    case EndianEnum.EndianType.CDAB: // 3412
+                    case EndianEnum.QJEndianType.CDAB: // 3412
                         SwapBytes(result, i + 0, i + 2);
                         SwapBytes(result, i + 1, i + 3);
                         break;
 
-                    case EndianEnum.EndianType.BADC: // 2143
+                    case EndianEnum.QJEndianType.BADC: // 2143
                         SwapBytes(result, i + 0, i + 1);
                         SwapBytes(result, i + 2, i + 3);
                         break;
 
-                    case EndianEnum.EndianType.DCBA: // 4321
+                    case EndianEnum.QJEndianType.DCBA: // 4321
                         SwapBytes(result, i + 0, i + 3);
                         SwapBytes(result, i + 1, i + 2);
                         break;
@@ -144,7 +144,7 @@ namespace QJ.Communication.Core.Extension
         /// <summary>
         /// 將 byte[] 反序列化回陣列，支援不同端序
         /// </summary>
-        public static T[] FromByteArray<T>(this byte[] bytes, EndianEnum.EndianType endian = EndianEnum.EndianType.ABCD)
+        public static T[] FromByteArray<T>(this byte[] bytes, EndianEnum.QJEndianType endian = EndianEnum.QJEndianType.ABCD)
         {
             if (bytes == null || bytes.Length == 0)
                 return default;
@@ -161,18 +161,18 @@ namespace QJ.Communication.Core.Extension
         /// <summary>
         /// 獲取相反的端序（用於反序列化）
         /// </summary>
-        private static EndianEnum.EndianType GetReverseEndian(EndianEnum.EndianType endian)
+        private static EndianEnum.QJEndianType GetReverseEndian(EndianEnum.QJEndianType endian)
         {
             switch (endian)
             {
-                case EndianEnum.EndianType.CDAB:
-                    return EndianEnum.EndianType.CDAB;  // CDAB 是自反的
-                case EndianEnum.EndianType.BADC:
-                    return EndianEnum.EndianType.BADC;  // BADC 是自反的
-                case EndianEnum.EndianType.DCBA:
-                    return EndianEnum.EndianType.DCBA;  // DCBA 是自反的
+                case EndianEnum.QJEndianType.CDAB:
+                    return EndianEnum.QJEndianType.CDAB;  // CDAB 是自反的
+                case EndianEnum.QJEndianType.BADC:
+                    return EndianEnum.QJEndianType.BADC;  // BADC 是自反的
+                case EndianEnum.QJEndianType.DCBA:
+                    return EndianEnum.QJEndianType.DCBA;  // DCBA 是自反的
                 default:
-                    return EndianEnum.EndianType.ABCD;
+                    return EndianEnum.QJEndianType.ABCD;
             }
         }
     }
