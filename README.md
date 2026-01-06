@@ -211,6 +211,8 @@
 ## 實例分享
 ### Modbus批量寫入
 ![image](https://github.com/user-attachments/assets/d900253b-c0ca-4e7c-b8cf-47fb33a7054b)
+### HelloWrld專案
+![image](https://github.com/godchadigo/QJ.Communication.Demo/blob/master/pic/HelloWord%E5%B0%88%E6%A1%88.png)
 
 ## 插件列表
 | 名稱  | 是否開放 | 是否商業 | 時間限制 | 完程度 | 誰可以使用|
