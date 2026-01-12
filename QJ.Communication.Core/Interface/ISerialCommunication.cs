@@ -15,7 +15,7 @@ namespace QJ.Communication.Core.Interface
         QJResult<QJSerialPortClient> Connect(QJSerialPortProp serialProp);
         QJResult<QJSerialPortClient> Connect(QJSerialPortClient client);
         void Disconnect();
-        Task ConnectAsync(QJSerialPortProp serialProp);
+        Task<QJResult<QJSerialPortClient>> ConnectAsync(QJSerialPortProp serialProp,int timeout);
         Task DisconnectAsync();
         void Send(byte[] data);
         Task SendAsync(byte[] data);

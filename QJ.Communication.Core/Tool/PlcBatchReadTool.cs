@@ -1,4 +1,5 @@
 ﻿using QJ.Communication.Core.Cores.Tcp;
+using QJ.Communication.Core.Enums;
 using QJ.Communication.Core.Extension;
 using QJ.Communication.Core.Model.Plugin;
 using QJ.Communication.Core.Model.Result;
@@ -19,6 +20,7 @@ namespace QJ.Communication.Core.Tool
         private ConcurrentDictionary<string, List<JunctionVariable>> junctionVariableGroup = new ConcurrentDictionary<string, List<JunctionVariable>>();
         private EndianType _formate;
         private readonly ILogger _logger;
+        private bool isDebug = false;
         public PlcBatchReadTool(ILogger logger, EndianType formate = EndianType.LittleSwap)
         {
             this._formate = formate;
@@ -49,6 +51,7 @@ namespace QJ.Communication.Core.Tool
                 junctionVariable.VariableBody = junctionVariable.VariableBody;
                 //junctionVariable.VariableLength = 1;
                 junctionVariable.VariableLength = rawVariable.Length;
+                junctionVariable.Divisor = rawVariable.Divisor;
                 //junctionVariable.BindingUuid = rawVariable.BindingUuid;
                 //junctionVariable.EqualsString = rawVariable.EqualsString;
 
@@ -153,7 +156,7 @@ namespace QJ.Communication.Core.Tool
             foreach (var junctionVariable in junctionList)
             {
                 QJResult<List<byte>> _ = new QJResult<List<byte>>();
-                if (junctionVariable.VariableType == TypeCode.Boolean)
+                if (junctionVariable.VariableType == QJDataTypeEnum.Boolean)
                 {
                     List<byte> _boolData = new List<byte>();
 
@@ -161,7 +164,7 @@ namespace QJ.Communication.Core.Tool
                     if (commPlugin is QJTcpPluginBase tcpPlugin)
                     {
                         boolRes = await tcpPlugin.ReadBoolAsync(junctionVariable.StartAddress.SplitPlcTagString().header, junctionVariable.StartAddress.SplitPlcTagString().number, junctionVariable.ReadLength);
-                        _logger.Information($"[junctionVariable] ReadBit {tcpPlugin.IpAddress}:{tcpPlugin.Port} 讀取變數：{junctionVariable.StartAddress}，長度：{junctionVariable.ReadLength}，結果：{boolRes.IsOk}，消息：{_.Message}");
+                        if (isDebug) _logger.Information($"[junctionVariable] ReadBit {tcpPlugin.IpAddress}:{tcpPlugin.Port} 讀取變數：{junctionVariable.StartAddress}，長度：{junctionVariable.ReadLength}，結果：{boolRes.IsOk}，消息：{_.Message}");
                     }
 
                     if (commPlugin is QJTcpPluginBase serialPlugin)
@@ -190,7 +193,7 @@ namespace QJ.Communication.Core.Tool
                     if (commPlugin is QJTcpPluginBase tcpPlugin)
                     {
                         _ = await tcpPlugin.ReadAsync(junctionVariable.StartAddress.SplitPlcTagString().header, junctionVariable.StartAddress.SplitPlcTagString().number, junctionVariable.ReadLength);
-                        _logger.Information($"[junctionVariable] ReadWord {tcpPlugin.IpAddress}:{tcpPlugin.Port} 讀取變數：{junctionVariable.StartAddress}，長度：{junctionVariable.ReadLength}，結果：{_.IsOk}，消息：{_.Message}");
+                        if (isDebug) _logger.Information($"[junctionVariable] ReadWord {tcpPlugin.IpAddress}:{tcpPlugin.Port} 讀取變數：{junctionVariable.StartAddress}，長度：{junctionVariable.ReadLength}，結果：{_.IsOk}，消息：{_.Message}");
                     }
                     if (commPlugin is QJSerialPluginBase serialPlugin)
                     {
@@ -220,7 +223,7 @@ namespace QJ.Communication.Core.Tool
                         var realAdr = 0;
                         var _len = 0;
 
-                        if (type == TypeCode.Boolean)
+                        if (type == QJDataTypeEnum.Boolean)
                         {
                             realAdr = (number - baseAdr) * 1;
                             _len = len;
@@ -244,41 +247,41 @@ namespace QJ.Communication.Core.Tool
                             // 判斷類型
                             switch (type)
                             {
-                                case TypeCode.Boolean:
+                                case QJDataTypeEnum.Boolean:
                                     var _cnt = 0;
                                     _value += byteBlockMemory.ReadValue<bool>().ToString().ToLower() + bk;
                                     _pointer += 1;
 
                                     break;
-                                case TypeCode.UInt16:                                    
+                                case QJDataTypeEnum.UINT16:                                    
                                     _value += byteBlockMemory.ReadValue<UInt16>(_formate).ToString() + bk;
                                     _pointer += 2;
                                     break;
-                                case TypeCode.Int16:
+                                case QJDataTypeEnum.INT16:
                                     _value += byteBlockMemory.ReadValue<Int16>(_formate).ToString() + bk;
                                     _pointer += 2;
                                     break;
-                                case TypeCode.UInt32:
+                                case QJDataTypeEnum.UINT32:
                                     _value += byteBlockMemory.ReadValue<UInt32>(_formate).ToString() + bk;
                                     _pointer += 4;
                                     break;
-                                case TypeCode.Int32:
+                                case QJDataTypeEnum.INT32:
                                     _value += byteBlockMemory.ReadValue<int>(_formate).ToString() + bk;
                                     _pointer += 4;
                                     break;
-                                case TypeCode.UInt64:
+                                case QJDataTypeEnum.UINT64:
                                     _value += byteBlockMemory.ReadValue<UInt64>(_formate).ToString() + bk;
                                     _pointer += 8;
                                     break;
-                                case TypeCode.Int64:
+                                case QJDataTypeEnum.INT64:
                                     _value += byteBlockMemory.ReadValue<Int64>(_formate).ToString() + bk;
                                     _pointer += 8;
                                     break;
-                                case TypeCode.Single:
+                                case QJDataTypeEnum.FLOAT:
                                     _value += byteBlockMemory.ReadValue<float>(_formate).ToString() + bk;
                                     _pointer += 4;
                                     break;
-                                case TypeCode.Double:
+                                case QJDataTypeEnum.DOUBLE:
                                     _value += byteBlockMemory.ReadValue<double>(_formate).ToString() + bk;
                                     _pointer += 8;
                                     break;
@@ -292,6 +295,7 @@ namespace QJ.Communication.Core.Tool
                             variable.VariableName = rawJunctionVariable.VariableName;
                             variable.TagName = rawJunctionVariable.TagName;
                             variable.VariableType = rawJunctionVariable.VariableType;
+                            variable.Divisor = rawJunctionVariable.Divisor;
                             //variable.BindingUuid = rawJunctionVariable.BindingUuid;
                             //variable.EqualsString = rawJunctionVariable.EqualsString;
                             variable.TagValue = _value;
@@ -329,7 +333,7 @@ namespace QJ.Communication.Core.Tool
         /// 獲取讀取長度，底層解析由Word為基底。(16bit)
         /// </summary>
         /// <returns></returns>
-        private short GetReadLength(TypeCode type, short rawLength)
+        private short GetReadLength(QJDataTypeEnum type, short rawLength)
         {
 
             return ((short)(GetTypeLength(type) * rawLength));
@@ -339,25 +343,25 @@ namespace QJ.Communication.Core.Tool
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        private short GetTypeLength(TypeCode type)
+        private short GetTypeLength(QJDataTypeEnum type)
         {
             short length = 0;
             switch (type)
             {
-                case TypeCode.Int16:
-                case TypeCode.UInt16:
-                case TypeCode.String:
-                case TypeCode.Boolean:
+                case QJDataTypeEnum.INT16:
+                case QJDataTypeEnum.UINT16:
+                case QJDataTypeEnum.STRING:
+                case QJDataTypeEnum.Boolean:
                     length = 1;
                     break;
-                case TypeCode.Int32:
-                case TypeCode.UInt32:
-                case TypeCode.Single:
+                case QJDataTypeEnum.INT32:
+                case QJDataTypeEnum.UINT32:
+                case QJDataTypeEnum.FLOAT:
                     length = 2;
                     break;
-                case TypeCode.Int64:
-                case TypeCode.UInt64:
-                case TypeCode.Double:
+                case QJDataTypeEnum.INT64:
+                case QJDataTypeEnum.UINT64:
+                case QJDataTypeEnum.DOUBLE:
                     length = 4;
                     break;
             }
@@ -374,7 +378,7 @@ namespace QJ.Communication.Core.Tool
     public class VariableReadTag
     {
         private string _tagName;
-        private TypeCode _type = TypeCode.Empty;
+        private QJDataTypeEnum _type = QJDataTypeEnum.Empty;
         public string VariableName { get; set; }
         /// <summary>
         /// 完整位址，例如 "DM100"、"W0"、"R500"
@@ -405,24 +409,32 @@ namespace QJ.Communication.Core.Tool
         /// </summary>
         public ushort VariableBody { get; set; }
         public short Length { get; set; }
-        public string TagValue { get; set; }        
-        public TypeCode VariableType
+        public string TagValue { get; set; }
+        /// <summary>
+        /// 除數
+        /// </summary>
+        public float Divisor { get; set; }
+        public QJDataTypeEnum VariableType
         {
             get => _type;
             set
             {
-                if (value == TypeCode.Empty ||
-                    value == TypeCode.Object ||
-                    value == TypeCode.DateTime ||
-                    value == TypeCode.Decimal ||
-                    value == TypeCode.Char ||
-                    value == TypeCode.SByte ||
-                    value == TypeCode.Byte)
+                if (value == QJDataTypeEnum.Empty ||
+                    value == QJDataTypeEnum.BooleanArray ||
+                    value == QJDataTypeEnum.INT16Array ||
+                    value == QJDataTypeEnum.INT32Array ||
+                    value == QJDataTypeEnum.INT64Array ||
+                    value == QJDataTypeEnum.STRINGArray ||
+                    value == QJDataTypeEnum.DOUBLEArray)
                     throw new ArgumentException($"QJCommunication 暫不支持這個類型{value}");
                 _type = value;
             }
-        }        
+        }
 
+        public override string ToString()
+        {
+            return $"變數名稱:{VariableName} 標籤:{TagName} 長度:{Length} 數值:{TagValue}";
+        }
     }
     public class JunctionVariable : VariableReadTag
     {
@@ -438,7 +450,7 @@ namespace QJ.Communication.Core.Tool
         public string Uuid { get; set; }
         public string StartAddress { get; set; }
         public ushort ReadLength { get; set; }
-        public TypeCode VariableType { get; set; }
+        public QJDataTypeEnum VariableType { get; set; }
         public List<JunctionVariable> RawJunctionVariables { get; set; }
     }
 

@@ -24,11 +24,14 @@ namespace QJ.Communication.Core.Model.Plugin
         /// <summary>
         /// 採用非同步方式轉發插件中的資料接收事件
         /// </summary>
-        public Func<IRecivedAdapterBase, IQJPlugin, Task> OnDataReceived;
+        public Func<IRecivedAdapterBase, IQJPlugin,DateTime, Task> OnDataReceived;
         /// <summary>
         /// 採用非同步方式轉發插件中的資料發送事件
         /// </summary>
-        public Func<byte[], int, IQJPlugin, Task> OnDataSend;
+        public Func<byte[], int, IQJPlugin, DateTime, Task> OnDataSend;
+
+        public Func<IQJPlugin, DateTime, Task> OnConnected;
+        public Func<IQJPlugin, DateTime, Task> OnClosed;
         #endregion
 
         #region 類別相關
@@ -83,8 +86,10 @@ namespace QJ.Communication.Core.Model.Plugin
         public QJPluginBase()
         {
             // 初始化事件委派，避免空引用異常
-            OnDataReceived = (adapterBase, plugin) => Task.CompletedTask;
-            OnDataSend = (data, len, plugin) => Task.CompletedTask;
+            OnDataReceived  = (adapterBase, plugin, trigDate) => Task.CompletedTask;
+            OnDataSend      = (data, len, plugin, trigDate) => Task.CompletedTask;
+            OnConnected     = (plugin, trigDate) => Task.CompletedTask;
+            OnClosed        = (plugin, trigDate) => Task.CompletedTask;
         }
 
         /// <summary>

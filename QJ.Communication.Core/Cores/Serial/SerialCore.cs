@@ -10,6 +10,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TouchSocket.SerialPorts;
+using System.Net;
+using System.Threading;
+
 
 #if NETFRAMEWORK
 using System.Windows.Forms;
@@ -95,10 +98,22 @@ namespace QJ.Communication.Core.Cores.Serial
             }
         }
 
-
-        public Task ConnectAsync(string ip, int port)
+        public async Task<QJResult> ConnectAsync(int timeout)
         {
-            return Task.CompletedTask;
+            var res = await ConnectAsync(serialProp, timeout);
+            return QJExtension.QJDataResponse(res.IsOk);
+        }
+        public async Task<QJResult> ConnectAsync(QJSerialPortProp props, int timeout)
+        {
+            
+            if (qJPlugin is QJSerialPluginBase serialPlugin)
+            {
+                serialProp = props;
+                var res = await serialPlugin.ConnectAsync(props, timeout);
+                return QJExtension.QJDataResponse(res.IsOk);
+            }
+
+            return new QJResult() { IsOk = false };
         }
 
         public Task DisconnectAsync()

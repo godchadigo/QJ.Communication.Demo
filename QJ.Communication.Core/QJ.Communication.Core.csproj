@@ -8,10 +8,10 @@
     <Platforms>AnyCPU;ARM64</Platforms>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="TouchSocket" Version="4.0.6" />
-    <PackageReference Include="TouchSocket.Core" Version="4.0.6" />
-    <PackageReference Include="TouchSocket.SerialPorts" Version="4.0.6" />
+  <ItemGroup> 
+    <PackageReference Include="TouchSocket" Version="4.0.7" />
+    <PackageReference Include="TouchSocket.Core" Version="4.0.7" />
+    <PackageReference Include="TouchSocket.SerialPorts" Version="4.0.7" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">

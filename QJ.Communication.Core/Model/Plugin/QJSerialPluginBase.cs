@@ -29,7 +29,7 @@ namespace QJ.Communication.Core.Model.Plugin
 
         #region ISerialCommunication
         public virtual QJSerialPortProp serialProp { get; set; }
-        public QJSerialPortClient serialClient = new QJSerialPortClient();
+        public QJSerialPortClient _serialClient = new QJSerialPortClient();
         public virtual QJResult<QJSerialPortClient> Connect(QJSerialPortProp serialProp)
         {
             QJResult<QJSerialPortClient> qJResult = new QJResult<QJSerialPortClient>() { IsOk = false };
@@ -43,7 +43,7 @@ namespace QJ.Communication.Core.Model.Plugin
 
                 
                 // 實現串口通訊Client端
-                serialClient.SetupAsync(new TouchSocketConfig()
+                _serialClient.SetupAsync(new TouchSocketConfig()
                      .SetSerialPortOption(options =>
                      {
                          options.BaudRate = serialProp.BaudRate;//波特率
@@ -59,12 +59,12 @@ namespace QJ.Communication.Core.Model.Plugin
 
                 
                 // 連線目標設備
-                serialClient.ConnectAsync();
+                _serialClient.ConnectAsync();
 
                 Log.Information("Serial Client Connected!");
                 Console.WriteLine("Serial Client Connected!");
                 qJResult.IsOk = true;
-                qJResult.Data = serialClient;
+                qJResult.Data = _serialClient;
                 return qJResult;
             }
             catch(Exception ex)
@@ -91,14 +91,14 @@ namespace QJ.Communication.Core.Model.Plugin
 
             }
         }
-        public virtual async Task ConnectAsync(QJSerialPortProp serialProp)
+        public virtual async Task<QJResult<QJSerialPortClient>> ConnectAsync(QJSerialPortProp serialProp,int timeout)
         {
             throw new NotImplementedException();
         }
 
         public virtual void Disconnect()
         {
-            serialClient.CloseAsync();
+            _serialClient.CloseAsync();
         }
 
         public virtual async Task DisconnectAsync()
@@ -118,7 +118,7 @@ namespace QJ.Communication.Core.Model.Plugin
         public async Task SendAsync(ReadOnlyMemory<byte> memory)
         {
 
-            if (serialClient != null && (serialClient.Online))
+            if (_serialClient != null && (_serialClient.Online))
             {
                 var data = memory.ToArray();
                 string str = string.Empty;
@@ -139,7 +139,7 @@ namespace QJ.Communication.Core.Model.Plugin
 
                 }
 
-                await serialClient.SendAsync(memory).ConfigureAwait(false);
+                await _serialClient.SendAsync(memory).ConfigureAwait(false);
 
             }
         }
@@ -151,16 +151,16 @@ namespace QJ.Communication.Core.Model.Plugin
         public virtual async Task<QJResult<byte[]>> SendThenRecivedAsync(byte[] data)
         {
             QJResult<byte[]> qJResult = new QJResult<byte[]>();
-            if (serialClient != null)
+            if (_serialClient != null)
             {
-                if (!serialClient.Online)
+                if (!_serialClient.Online)
                 {
                     qJResult.IsOk = false;
                     qJResult.Message = "連線階段斷開";
                     return qJResult;
                 }
                 //调用CreateWaitingClient获取到IWaitingClient的对象。
-                var waitClient = serialClient.CreateWaitingClient(new WaitingOptions()
+                var waitClient = _serialClient.CreateWaitingClient(new WaitingOptions()
                 {
                     FilterFunc = response => //设置用于筛选的fun委托，当返回为true时，才会响应返回
                     {
@@ -197,16 +197,16 @@ namespace QJ.Communication.Core.Model.Plugin
             QJResult<IRequestInfo> qJResult = new QJResult<IRequestInfo>();
             try
             {
-                if (serialClient != null)
+                if (_serialClient != null)
                 {
-                    if (!serialClient.Online)
+                    if (!_serialClient.Online)
                     {
                         qJResult.IsOk = false;
                         qJResult.Message = "連線階段斷開";
                         return qJResult;
                     }
                     //调用CreateWaitingClient获取到IWaitingClient的对象。
-                    var waitClient = serialClient.CreateWaitingClient(new WaitingOptions()
+                    var waitClient = _serialClient.CreateWaitingClient(new WaitingOptions()
                     {
                         /*
                         FilterFunc = response => //设置用于筛选的fun委托，当返回为true时，才会响应返回

@@ -78,31 +78,6 @@ namespace QJ.Communication.Core.Model.Plugin
                 IpAddress = ip;
                 Port = port;
 
-                _tcpClient = new TcpClient();
-                _tcpClient.Connecting = (client, e) => { return EasyTask.CompletedTask; };//即将连接到服务器，此时已经创建socket，但是还未建立tcp
-                _tcpClient.Connected = (client, e) => {
-                    Console.WriteLine($"{client.IP} 連接到伺服器成功!");
-                    return EasyTask.CompletedTask;
-                };//成功连接到服务器
-                _tcpClient.Closing = (client, e) => { return EasyTask.CompletedTask; };//即将从服务器断开连接。此处仅主动断开才有效。
-                _tcpClient.Closed = (client, e) => {
-                    Console.WriteLine($"{client.IP} 與伺服器斷開!");
-                    return EasyTask.CompletedTask; 
-                };//从服务器断开连接，当连接不成功时不会触发。
-
-                //载入配置
-                await _tcpClient.SetupAsync(new TouchSocketConfig()
-                      .SetRemoteIPHost($"{IpAddress}:{Port}")
-                      .ConfigureContainer(a =>
-                      {
-                          a.AddConsoleLogger();//添加一个日志注入
-                      })
-                      .ConfigurePlugins(a =>
-                      {
-                          //a.UseTcpReconnection();
-                      }));
-
-
                 // 訂閱接收事件到TcpPluginBase上
                 _tcpClient.Received += async (sender, e) => {
 
@@ -110,14 +85,18 @@ namespace QJ.Communication.Core.Model.Plugin
                     if (e.RequestInfo is IRecivedAdapterBase recivedAdapter)
                     {
                         // 轉發接收到的數據
-                        await TriggerRecivedRawData(recivedAdapter);
+                        await TriggerRecivedRawData(recivedAdapter, DateTime.Now);
                     }
                 };
 
-                await _tcpClient.ConnectAsync(timeout);//调用连接，当连接不成功时，会抛出异常。
+                _tcpClient.Connected += async (sender, e) => 
+                {
+                    await TriggerOnConnected(DateTime.Now);
+                };
+                _tcpClient.Closed += async (sender, e) => {
+                    await TriggerOnClosed(DateTime.Now);
+                };
 
-                //Log.Information("Tcp Client Connected!");
-                Console.WriteLine("Tcp Client Connected!");
                 qJResult.IsOk = true;
                 qJResult.Data = _tcpClient;
                 return qJResult;
@@ -183,7 +162,7 @@ namespace QJ.Communication.Core.Model.Plugin
 #endif
 
                 // 轉發發送的原始數據
-                await TriggerSendRawData(memory.ToArray(), memory.Length);
+                await TriggerSendRawData(memory.ToArray(), memory.Length, DateTime.Now);
                 await _tcpClient.SendAsync(memory).ConfigureAwait(false);
                 
             }
@@ -275,16 +254,23 @@ namespace QJ.Communication.Core.Model.Plugin
 #endregion
 
         #region 轉發事件功能插件
-        public virtual async Task TriggerSendRawData(byte[] data, int len)
+        public virtual async Task TriggerSendRawData(byte[] data, int len, DateTime trigDate)
         {
-            await OnDataSend(data, len, this).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
+            await OnDataSend(data, len, this, trigDate).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
         }
 
-        public virtual async Task TriggerRecivedRawData(IRecivedAdapterBase recivedAdapter)
+        public virtual async Task TriggerRecivedRawData(IRecivedAdapterBase recivedAdapter, DateTime trigDate)
         {
-            await OnDataReceived(recivedAdapter, this).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
+            await OnDataReceived(recivedAdapter, this, trigDate).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
         }
-
+        public virtual async Task TriggerOnConnected(DateTime trigDate)
+        {
+            await OnConnected(this, trigDate).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
+        }
+        public virtual async Task TriggerOnClosed(DateTime trigDate)
+        {
+            await OnClosed(this, trigDate).ConfigureAwait(EasyTask.ContinueOnCapturedContext);
+        }
         public QJResult<TcpClient> Connect(string ip, int port)
         {
             throw new NotImplementedException();
@@ -321,7 +307,7 @@ namespace QJ.Communication.Core.Model.Plugin
                     if (e.RequestInfo is IRecivedAdapterBase recivedAdapter)
                     {
                         // 轉發接收到的數據
-                        await TriggerRecivedRawData(recivedAdapter);
+                        await TriggerRecivedRawData(recivedAdapter, DateTime.Now);
                     }
                 };
 
