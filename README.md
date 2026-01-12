@@ -20,6 +20,17 @@
 ### 學生友好
 - 如果是在校學生，不管事學校專題或是個人興趣，一律無時間限制，可私下與我獲取學生版本!
 
+## 插件列表
+| 名稱  | 是否開放 | 是否商業 | 時間限制 | 完程度 | 誰可以使用|
+| ----- | -------- | -------- | ------|------|-----|
+| ModbusTcpV2     | 是    |  否  | 24HR  |100%    |開源社群    |
+| ModbusTcpV2     | 是    |  否  | 無    |100%    |商業用戶    |
+| Mc3EBinNet      | 否    |  否  | 無    |100%    |商業用戶    |
+| KvHost          | 否    |  否  | 無    |100%    |商業用戶    |
+| VigorVsOverTcp  | 否   |  否  | 無    |100%    |商業用戶    |
+| VigorVsRtu      | 否   |  否  | 無    |100%    |商業用戶    |
+
+
 
 ### 框架優點
 - 斷線自動重連
@@ -218,13 +229,6 @@
 ### HelloWrld專案
 ![image](https://github.com/godchadigo/QJ.Communication.Demo/blob/master/pic/HelloWord%E5%B0%88%E6%A1%88.png)
 
-## 插件列表
-| 名稱  | 是否開放 | 是否商業 | 時間限制 | 完程度 | 誰可以使用|
-| ----- | -------- | -------- | ------|------|-----|
-| ModbusTcpV2     | 是    |  否  | 24HR  |100%    |開源社群    |
-| ModbusTcpV2     | 是    |  否  | 無    |100%    |商業用戶    |
-| Mc3EBin         | 否    |  否  | 無    |100%    |商業用戶    |
-| VigorVsOverTcp   | 否   |  否  | 無    |100%    |商業用戶    |
 
 ## 社群討論
 Line社群 : https://line.me/ti/g2/r7X-QLCfoWDjBdrwbv5QGdhwBTtv26QESugSrA?utm_source=invitation&utm_medium=link_copy&utm_campaign=default
