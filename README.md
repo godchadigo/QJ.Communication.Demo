@@ -228,8 +228,10 @@ Line社群 : https://line.me/ti/g2/r7X-QLCfoWDjBdrwbv5QGdhwBTtv26QESugSrA?utm_so
 ## 實例分享
 ### Modbus批量寫入
 ![image](https://github.com/user-attachments/assets/d900253b-c0ca-4e7c-b8cf-47fb33a7054b)
-### HelloWrld專案
+### HelloWrld專案(QJ.Communication.Study.HelloWorld)
 ![image](https://github.com/godchadigo/QJ.Communication.Demo/blob/master/pic/HelloWord%E5%B0%88%E6%A1%88.png)
+### 事件綁定專案(QJ.Communication.Study.SubEvent)
+![image](https://github.com/godchadigo/QJ.Communication.Demo/blob/master/pic/%E4%BA%8B%E4%BB%B6%E8%A8%82%E9%96%B1%E6%95%99%E5%AD%B8.png)
 
 
 
