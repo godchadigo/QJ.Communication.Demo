@@ -30,6 +30,8 @@
 | VigorVsOverTcp  | 否   |  否  | 無    |100%    |商業用戶    |
 | VigorVsRtu      | 否   |  否  | 無    |100%    |商業用戶    |
 
+## 社群討論
+Line社群 : https://line.me/ti/g2/r7X-QLCfoWDjBdrwbv5QGdhwBTtv26QESugSrA?utm_source=invitation&utm_medium=link_copy&utm_campaign=default
 
 
 ### 框架優點
@@ -230,8 +232,6 @@
 ![image](https://github.com/godchadigo/QJ.Communication.Demo/blob/master/pic/HelloWord%E5%B0%88%E6%A1%88.png)
 
 
-## 社群討論
-Line社群 : https://line.me/ti/g2/r7X-QLCfoWDjBdrwbv5QGdhwBTtv26QESugSrA?utm_source=invitation&utm_medium=link_copy&utm_campaign=default
 
 ## 影片
 ### 使用者
